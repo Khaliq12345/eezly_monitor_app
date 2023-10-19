@@ -12,7 +12,7 @@ with col2:
 num = st.selectbox('Number of rows to show:',
              options=[5, 10, 20])
 head_tail = st.selectbox(
-    'Head or Tail', options=['head', 'tail']
+    'Head or Tail', options=['top', 'bottom']
 )
 run_button = st.button('Run')
 
@@ -37,7 +37,7 @@ if run_button:
           st.success(f'Key: {key}')
           st.session_state['s3'].Bucket(BUCKET).Object(key).download_file('data.json')
           df = pd.read_json('data.json')
-          if head_tail == 'head':
+          if head_tail == 'top':
               st.dataframe(df.head(num))
           else:
               st.dataframe(df.tail(num))
