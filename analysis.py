@@ -27,11 +27,12 @@ if 'session' not in st.session_state:
 if run_button:
     objects = list(st.session_state['s3'].Bucket(BUCKET).objects.all())
     obj_keys = [obj.key for obj in objects if '2023/42' in obj.key]
-    for key in obj_keys:
-        st.success(f'Key: {key}')
-        st.session_state['s3'].Bucket(BUCKET).Object(key).download_file('data.json')
-        df = pd.read_json('data.json')
-        if head_tail == 'head':
-            st.dataframe(df.head(num))
-        else:
-            st.dataframe(df.tail(num))
+    with st.spinner():
+      for key in obj_keys:
+          st.success(f'Key: {key}')
+          st.session_state['s3'].Bucket(BUCKET).Object(key).download_file('data.json')
+          df = pd.read_json('data.json')
+          if head_tail == 'head':
+              st.dataframe(df.head(num))
+          else:
+              st.dataframe(df.tail(num))
