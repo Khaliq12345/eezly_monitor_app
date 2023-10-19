@@ -4,6 +4,11 @@ import boto3
 
 st.set_page_config(layout='wide')
 st.title('Data Monitoring App')
+col1, col2 = st.columns(2)
+with col1:
+    week = st.text_input(label='Week')
+with col2:
+    year = st.text_input(label='Year')
 num = st.selectbox('Number of rows to show:',
              options=[5, 10, 20])
 head_tail = st.selectbox(
@@ -26,7 +31,7 @@ if 'session' not in st.session_state:
 
 if run_button:
     objects = list(st.session_state['s3'].Bucket(BUCKET).objects.all())
-    obj_keys = [obj.key for obj in objects if '2023/42' in obj.key]
+    obj_keys = [obj.key for obj in objects if f'{year}/{week}' in obj.key]
     with st.spinner():
       for key in obj_keys:
           st.success(f'Key: {key}')
