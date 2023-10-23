@@ -1,14 +1,17 @@
 import streamlit as st
 import pandas as pd
 import boto3
+from datetime import datetime
+
+year, week_num, day_of_week = datetime.today().isocalendar() 
 
 st.set_page_config(layout='wide')
 st.title('Data Monitoring App')
 col1, col2 = st.columns(2)
 with col1:
-    week = st.text_input(label='Week', placeholder=42)
+    week = st.text_input(label='Week', placeholder=week_num)
 with col2:
-    year = st.text_input(label='Year', placeholder=2023)
+    year = st.text_input(label='Year', placeholder=year)
 num = st.selectbox('Number of rows to show:',
              options=[5, 10, 20])
 head_tail = st.selectbox(
