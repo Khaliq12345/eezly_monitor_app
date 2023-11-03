@@ -9,9 +9,9 @@ st.set_page_config(layout='wide')
 st.title('Data Monitoring App')
 col1, col2 = st.columns(2)
 with col1:
-    week = st.text_input(label='Week', placeholder=week_num)
+    week = st.text_input(label='Week', value=week_num)
 with col2:
-    year = st.text_input(label='Year', placeholder=year_num)
+    year = st.text_input(label='Year', value=year_num)
 num = st.selectbox('Number of rows to show:',
              options=[5, 10, 20])
 head_tail = st.selectbox(
