@@ -34,7 +34,7 @@ if 'session' not in st.session_state:
 
 if run_button:
     objects = list(st.session_state['s3'].Bucket(BUCKET).objects.all())
-    obj_keys = [obj.key for obj in objects if f'{year}/{week}' in obj.key]
+    obj_keys = [obj.key for obj in objects if f'dev/update/{year}/{week}' in obj.key]
     with st.spinner():
       for key in obj_keys:
           st.success(f'Key: {key}')
