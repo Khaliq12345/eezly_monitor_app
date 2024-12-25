@@ -9,15 +9,20 @@ st.set_page_config(layout='wide')
 st.title('Data Monitoring App')
 col1, col2 = st.columns(2)
 with col1:
-    week = st.text_input(label='Week', value=week_num)
-with col2:
     year = st.text_input(label='Year', value=year_num)
-num = st.selectbox('Number of rows to show:',
-             options=[5, 10, 20])
-head_tail = st.selectbox(
-    'Top or Bottom', options=['top', 'bottom']
-)
-run_button = st.button('Run')
+    environment = st.selectbox('Enviroment', options=['beta', 'prod'])
+    num = st.selectbox('Number of rows to show:',
+                options=[5, 10, 20])
+    store = st.text_input(label='Store')
+with col2:
+    week = st.text_input(label='Week', value=week_num)
+    script = st.selectbox('Script', options=['update', 'scrape'])
+    head_tail = st.selectbox(
+        'Top or Bottom', options=['top', 'bottom']
+    )
+    language = st.selectbox(label='Language', options=['all', 'en', 'fr'])
+
+run_button = st.button('Run', use_container_width=True, type='primary')
 
 AWS_ACCESS_KEY_ID = st.secrets['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = st.secrets['AWS_SECRET_ACCESS_KEY']
@@ -32,15 +37,27 @@ if 'session' not in st.session_state:
     s3 = session.resource('s3')
     st.session_state['s3'] = s3
 
+
+def process_key(key: str):
+    st.success(f'Key: {key}')
+    st.session_state['s3'].Bucket(BUCKET).Object(key).download_file('data.json')
+    df = pd.read_json('data.json')
+    if head_tail == 'top':
+        st.dataframe(df.head(num))
+    else:
+        st.dataframe(df.tail(num))
+
 if run_button:
-    objects = list(st.session_state['s3'].Bucket(BUCKET).objects.all())
-    obj_keys = [obj.key for obj in objects if f'dev/update/{year}/{week}' in obj.key]
+    bucket = st.session_state['s3'].Bucket('eezly-weekly-scripts')
+    objects = list(bucket.objects.filter(Prefix=f'{environment}/{script}/{year}/{week}').all())
+    obj_keys = [obj.key for obj in objects]
     with st.spinner():
-      for key in obj_keys:
-          st.success(f'Key: {key}')
-          st.session_state['s3'].Bucket(BUCKET).Object(key).download_file('data.json')
-          df = pd.read_json('data.json')
-          if head_tail == 'top':
-              st.dataframe(df.head(num))
-          else:
-              st.dataframe(df.tail(num))
+        for key in obj_keys:
+            language_match = (language == 'all') or key.endswith(f'{language}.json')
+            store_match = (not store) or f'{store}_' in key
+            if language_match and store_match:
+                process_key(key)
+        
+            
+                  
+
